@@ -18,10 +18,10 @@ Nielsen, M. (2015). Neural Networks & Deep Learning. Determination Press:San Fra
   [Chapter 1](http://neuralnetworksanddeeplearning.com/chap1.html)  
   [Charpter 2](http://neuralnetworksanddeeplearning.com/chap2.html)  
 
-For more detail:
-[Stergiou, C. & Siganos, D. (2000). Neural Networks.](http://www.doc.ic.ac.uk/~nd/surprise_96/journal/vol4/cs11/report.html)
+[McKlin, T., Harmon, S. W., Evans, W., & Jones, M. G. (2001). Cognitive presence in Web-based learning: A content analysis of students' online discussions.](https://files.eric.ed.gov/fulltext/ED470101.pdf)  
 
-[McKlin, T., Harmon, S. W., Evans, W., & Jones, M. G. (2001). Cognitive presence in Web-based learning: A content analysis of students' online discussions.](https://files.eric.ed.gov/fulltext/ED470101.pdf)
+For more detail:  
+[Stergiou, C. & Siganos, D. (2000). Neural Networks.](http://www.doc.ic.ac.uk/~nd/surprise_96/journal/vol4/cs11/report.html)
 
 ## Videos
 
