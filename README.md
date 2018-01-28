@@ -14,9 +14,9 @@ In this unit you will be building a neural network to predict student attentiona
 
 ##  Readings
 
-Nielsen, M. (2015). Neural Networks & Deep Learning. Determination Press:San Francisco, CA
-  [Chapter 1](http://neuralnetworksanddeeplearning.com/chap1.html)
-  [Charpter 2](http://neuralnetworksanddeeplearning.com/chap2.html)
+Nielsen, M. (2015). Neural Networks & Deep Learning. Determination Press:San Francisco, CA  
+  [Chapter 1](http://neuralnetworksanddeeplearning.com/chap1.html)  
+  [Charpter 2](http://neuralnetworksanddeeplearning.com/chap2.html)  
 
 For more detail:
 [Stergiou, C. & Siganos, D. (2000). Neural Networks.](http://www.doc.ic.ac.uk/~nd/surprise_96/journal/vol4/cs11/report.html)
