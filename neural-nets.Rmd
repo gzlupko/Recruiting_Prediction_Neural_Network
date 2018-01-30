@@ -54,7 +54,7 @@ D3 <-
 
 Now you can create predictions using your neural net
 ```{r}
-net.prediction <- compute(net, D3)
+net.prediction <- neuralnet::compute(net, D3)
 
 #You can access the predictions from your model as "net.prediction$net.result". Predictions will be numeric estimates from 1 or 0, convert these into exact predictions of 1 and 0 and then determine the accuracy of your neural net on this new data.
 
