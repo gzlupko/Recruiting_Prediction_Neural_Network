@@ -12,6 +12,11 @@ In the attached data sets attention1.csv and attention2.csv, you will find data 
 eyes - student has their eyes open (1 = yes, 0 = no)
 face.forward - student is facing the camera (1 = yes, 0 = no)
 chin.up - student's chin is raised above 45 degrees (1 = yes, 0 = no)
+squint - eyes are squinting
+hunch - shoulders are hunched over
+mouth1 - mouth is smiling
+mouth2 - mouth is frowning
+mouth3 - mouth is open
 attention - whether the student was paying attention when asked (1 = yes, 0 = no)
 
 We will use the webcam data to build a neural net to predict whether or not a student is attending.
@@ -24,39 +29,50 @@ library(neuralnet)
 
 Now upload your data
 ```{r}
-D1 <-
+D1 <- 
   
-D2 <-
+D2 <- 
 ```
 
 Now you can build a neural net that predicts attention based on webcam images. The command "neuralnet" sets up the model. It is composed of four basic arguments:
 
 - A formula that describes the inputs and outputs of the neural net (attention is our output)
 - The data frame that the model will use
-- How many hidden layers are in our neural net
+- How many nodes are in the hidden layer
 - A threshold that tells the model when to stop adjusting weights to find a better fit. If error does not change more than the threshold from one iteration to the next, the algorithm will stop (We will use 0.01, so if prediction error does not change by more than 1% from one iteration to the next the algorithm will halt)
 
 ```{r}
-net <- neuralnet(attention ~ eyes + face.forward + chin.up, D1, hidden = 1, threshold = 0.01)
+nn <- neuralnet(attention == 1 ~ eyes + face.forward + chin.up + squint + hunch + mouth1 + mouth2 + mouth3, D1, hidden = c(2,2), learningrate = 0.2)
 
-plot(net)
+plot(nn)
+
+#The option "hidden" allows you to change the number of hiddden layers and number of nodes within the hidden layers c(1,1) = one hidden layer with 1 node, 0 = zero hidden layers, etc
+
+#The option "learningrate" alters the size of the steps the model takes every time it adjusts the weights.
+
+#Change the hidden layers and learningrate options and check both the prediction accuracy 
 ```
 
-You have now trained a neural network! The plot shows you the layers of your newtork as black nodes and edges with the calculated weights on each edge. The blue nodes and edges are called bias terms. The bias term anchors the activation function, the weights change the shape of the activation function while the bias term changes the overall position of the activation function - if you have used linear regressionthe bias term is like the intercept of the regression equation, it shifts the trend line up and down the y axis, while the other parameters change the angle of the line. The plot also reports the final error rate and the number of iterations ("steps") that it took to reach these weights.
+You have now trained a neural network! The plot shows you the layers of your newtork as black nodes and edges with the calculated weights on each edge. The blue nodes and edges are the bias/threshold terms - it is a little bit confusing that they are represented as nodes, they are not nodes in the sense that the black nodes are. The bias anchors the activation function, the weights change the shape of the activation function while the bias term changes the overall position of the activation function - if you have used linear regression the bias term is like the intercept of the regression equation, it shifts the trend line up and down the y axis, while the other parameters change the angle of the line. The plot also reports the final error rate and the number of iterations ("steps") that it took to reach these weights.
 
-What happens if you increase the number of hidden layers in the neural net? Build a second neural net with more layers in it and determine if this iproves your predictions or not? How can you tell if your new neural network is doing a better job than your first?
+What happens if you increase the number of hidden layers in the neural net? Build a second neural net with more or fewer layers in it and determine if this improves your predictions or not? How can you tell if your new neural network is doing a better job than your first?
 
 Now use your preferred neural net to predict the second data set. You will need to create a new data frame (D3) that only includes the input layers to use this command.
 
 ```{r}
-D3 <-
+D3 <- 
 ```
 
 Now you can create predictions using your neural net
 ```{r}
-net.prediction <- neuralnet::compute(net, D3)
+#The code below will use your model to predict the outcome using D3 data
+pred <- predict(nn, D3)
 
-#You can access the predictions from your model as "net.prediction$net.result". Predictions will be numeric estimates from 1 or 0, convert these into exact predictions of 1 and 0 and then determine the accuracy of your neural net on this new data.
+#The code below will tell you how accurate your model is att predicting the unseen data
+table(D2$attention == 1, pred[, 1] > 0.5)
+
+#Adjust both the hidden layer and lerarning rate and see if that has an impact on error, steps and prediction accuracy
+
 
 ```
 
@@ -67,3 +83,7 @@ net.prediction <- neuralnet::compute(net, D3)
 2. How would you explain your model to the students whose behavior you are predicting? 
 
 3. This is a very simple example of a neural network. Real facial recognition is very complex though. Would a neural network be a good solution for predicting real facial movements? Why, why not? 
+
+## Repeat with your own data
+
+Either synthesize a data set or find a data set online and build a neural net to predict a binary outcome from several inputs. Split your data into two sets and use one set to train the neural net and the other set to make predictions. Change the hidden layers and learning rate until you get the most accurate model you can.
