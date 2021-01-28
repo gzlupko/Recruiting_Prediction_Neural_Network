@@ -12,7 +12,19 @@ Neural networks are not a new method, the first artificial neural network was de
 
 In this unit you will be building a neural network to predict student attentional state from webcam imags. As background to this task please read over the follwing materials and watch the methodological videos. If you find any other useful materials please add them under Additional Materials at the end of the this page and pull request the change back to this repo.
 
-##  Readings
+## Resources
+
+### Videos
+
+[![Introduction to Neural Networks](https://img.youtube.com/vi/x54ULLJSzBM/0.jpg)](https://youtu.be/x54ULLJSzBM)
+
+[Video Slide Deck](https://github.com/la-process-and-theory/prediction/blob/master/prediction-slides.pdf)
+
+[Sanderson, G. (2017). But what *is* a Neural Network? 3Blue1Brown. ](https://www.youtube.com/watch?v=aircAruvnKk)
+
+[Bling, S. (2017). MariFlow - Self-Driving Mario Kart with Recurrent Neural Network](https://www.youtube.com/watch?v=Ipi40cb_RsI)
+
+###  Readings
 
 Nielsen, M. (2015). Neural Networks & Deep Learning. Determination Press:San Francisco, CA  
   [Chapter 1](http://neuralnetworksanddeeplearning.com/chap1.html)  
@@ -25,16 +37,10 @@ For more detail:
 
 [Hartnett, K. (2019). Foundations Built for a General Theory of Neural Networks](https://www.quantamagazine.org/foundations-built-for-a-general-theory-of-neural-networks-20190131/)
 
-## Videos
 
-[Sanderson, G. (2017). But what *is* a Neural Network? 3Blue1Brown. ](https://www.youtube.com/watch?v=aircAruvnKk)
-
-[Grey, C.G.P. (2017). How Machines Learn.](https://www.youtube.com/watch?v=R9OHn5ZF4Uo)
-
-[Bling, S. (2017). MariFlow - Self-Driving Mario Kart with Recurrent Neural Network](https://www.youtube.com/watch?v=Ipi40cb_RsI)
 
 ## Knowledge Check
-Once you have completed all tasks in the unit, please complete the [knowledge check](https://tccolumbia.qualtrics.com/jfe/form/SV_bIchFX8s5M3Fdml).
+Once you have completed all tasks in the unit, please complete the [knowledge check](https://tccolumbia.qualtrics.com/jfe/form/SV_eJ0QJWNsklHsdro).
 
 ## Additional Materials
 
