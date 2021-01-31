@@ -18,7 +18,7 @@ In this unit you will be building a neural network to predict student attentiona
 
 [![Introduction to Neural Networks](https://img.youtube.com/vi/x54ULLJSzBM/0.jpg)](https://youtu.be/x54ULLJSzBM)
 
-[Video Slide Deck](https://github.com/la-process-and-theory/prediction/blob/master/prediction-slides.pdf)
+[Video Slide Deck](https://github.com/la-process-and-theory/neural-networks/blob/master/HUDK4051-neural-nets.pdf)
 
 [Sanderson, G. (2017). But what *is* a Neural Network? 3Blue1Brown. ](https://www.youtube.com/watch?v=aircAruvnKk)
 
