@@ -1,13 +1,13 @@
 ---
 title: "Neural Networks"
-author: "Charles Lang"
+author: "Gian Zlupko"
 date: "1/28/2018"
 output: html_document
 ---
 
 ## Part I - Introduction to Using Neural Nets
 
-In the attached data sets attention1.csv and attention2.csv, you will find data that describe features assocaited with webcam images of 100 students' faces as they particpate in an online discussion. The variables are:
+In the attached data sets attention1.csv and attention2.csv, you will find data that describe features associated with webcam images of 100 students' faces as they particpate in an online discussion. The variables are:
 
 eyes - student has their eyes open (1 = yes, 0 = no)
 face.forward - student is facing the camera (1 = yes, 0 = no)
@@ -21,17 +21,18 @@ attention - whether the student was paying attention when asked (1 = yes, 0 = no
 
 We will use the webcam data to build a neural net to predict whether or not a student is attending.
 
-First install and load the neuralnet package
+First load the neuralnet package and other libraries used 
 ```{r}
-install.packages("neuralnet")
+
 library(neuralnet)
+library(readr) 
 ```
 
-Now upload your data
+Upload data
 ```{r}
-D1 <- 
+D1 <- read_csv("attention1.csv") 
   
-D2 <- 
+D2 <- read_csv("attention2.csv") 
 ```
 
 Now you can build a neural net that predicts attention based on webcam images. The command "neuralnet" sets up the model. It is composed of four basic arguments:
@@ -46,11 +47,17 @@ nn <- neuralnet(attention == 1 ~ eyes + face.forward + chin.up + squint + hunch 
 
 plot(nn)
 
+
 #The option "hidden" allows you to change the number of hiddden layers and number of nodes within the hidden layers c(1,1) = one hidden layer with 1 node, 0 = zero hidden layers, etc
 
 #The option "learningrate" alters the size of the steps the model takes every time it adjusts the weights.
 
-#Change the hidden layers and learningrate options and check both the prediction accuracy 
+#Change the hidden layers and learningrate options and check both the prediction and accuracy
+
+
+
+nn1 <- neuralnet(attention == 1 ~ eyes + face.forward + chin.up + squint + hunch + mouth1 + mouth2 + mouth3, D1, hidden = c(2,2), learningrate = 0.2)
+
 ```
 
 You have now trained a neural network! The plot shows you the layers of your newtork as black nodes and edges with the calculated weights on each edge. The blue nodes and edges are the bias/threshold terms - it is a little bit confusing that they are represented as nodes, they are not nodes in the sense that the black nodes are. The bias anchors the activation function, the weights change the shape of the activation function while the bias term changes the overall position of the activation function - if you have used linear regression the bias term is like the intercept of the regression equation, it shifts the trend line up and down the y axis, while the other parameters change the angle of the line. The plot also reports the final error rate and the number of iterations ("steps") that it took to reach these weights.
