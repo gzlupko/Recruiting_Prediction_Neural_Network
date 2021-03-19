@@ -93,7 +93,7 @@ Now you can create predictions using your neural net
 #The code below will use your model to predict the outcome using D3 data
 pred <- predict(nn, D3)
 
-#The code below will tell you how accurate your model is att predicting the unseen data
+#The code below will tell you how accurate your model is at predicting the unseen data
 table(D2$attention == 1, pred[, 1] > 0.5)
 
 #Adjust both the hidden layer and learning rate and see if that has an impact on error, steps and prediction accuracy
@@ -177,28 +177,125 @@ summary(recruiting$gpa)
 sapply(recruiting, summary) 
 
 
-# data standardization ('feature scaling')
+# data normalization ('feature scaling')
 
-#min_max <- function(x) { 
+normalize <- function(x) {
   
-  #return((x- min(x) / max(x) - min(x))) }
+return ((x - min(x)) / (max(x) - min(x))) 
+  
+  } 
+
+recruiting_numeric <- as.data.frame(lapply(recruiting, as.numeric)) 
+recruiting_norm <- as.data.frame(lapply(recruiting_numeric, normalize)) 
+
 
 
 # data split 
 
+N <- (length(recruiting_norm$hired)/2)  
+
+train_size <- floor(nrow(recruiting_norm)*0.5) 
+test_size <- (nrow(recruiting_norm) - train_size) 
+
+
+set.seed(777)
+
+selected <- sample(seq_len(nrow(recruiting_norm)),size = train_size)
+training_set <- recruiting_norm[selected, ]
+test_set <- recruiting_norm[-selected, ]
+
+nrow(training_set) 
+nrow(test_set) 
+
+
+head(training_set) 
+head(test_set) 
+
+
+# hiring predictions with neural networks 
+
+hiring_mod_1 <- neuralnet(hired == 1 ~ sat + gpa + apttest + int1, training_set, hidden = c(2,2), learningrate = 0.2)
 
 
 
 
+train <- subset(training_set, select = c("gpa","gender", "apttest", "int1", "int2", "int3", "sat")) 
 
+#The code below will use your model to predict the outcome using D3 data
+
+
+pred <- predict(hiring_mod_1, train)
+
+table(test_set$hired == 1, pred[, 1] > 0.5)
+
+hiring_mod_accuracy <- function(mod) { 
+  
+pred <- predict(mod, train)
+x <- table(test_set$hired == 1, pred[, 1] > 0.5)
+true_neg <- x[1,1] 
+true_pos <- x[2,2] 
+false_pos <- x[1,2]
+false_neg <- x[2,1]
+correct <- (true_neg + true_pos) / (true_neg + true_pos + false_pos + false_neg)
+correct
+  
+}
+
+hiring_mod_accuracy(hiring_mod_1) 
 
 
 ```
 
+In the following code chunks I add inputs and layers to the nn model sequentially. I also adjust the model learning rate to optimize performance in prediction
+
+
+```{r}
+
+# add hidden layer to neural netowrk: subsequent interviews 
+
+hiring_mod_2 <- neuralnet(hired == 1 ~ sat + gpa + apttest + int1 + int2 + int3, training_set, hidden = c(2,2), learningrate = 0.2)
+
+
+hiring_mod_2
+pred_mod_2 <- predict(hiring_mod_2, train)
+table(test_set$hired == 1, pred_mod_2[, 1] > 0.5)
 
 
 
 
+# calculate nn model accuracy 
+hiring_mod_accuracy(hiring_mod_2) 
+
+
+```
+
+Add gender  
+
+```{r}
+
+hiring_mod_3 <- neuralnet(hired == 1 ~ sat + gpa + apttest + int1 + int2 + int3 ,training_set, hidden = c(3,2), learningrate = 0.2)
+
+# calculate nn model accuracy 
+hiring_mod_accuracy(hiring_mod_3, test_set) 
+
+
+predict(hiring_mod_3, test_set) 
+x <- table(df$hired == 1, hiring_pred[ , 1] > 0.5)
+
+?predict
+```
+
+
+Compare with logistic regression
+
+
+```{r}
+
+
+log_mod_1 <- glm(hired ~ sat + gpa + apttest + int1 + int2 + int3 , data = training_set, family = "binomial")
+
+
+```
 
 
 
