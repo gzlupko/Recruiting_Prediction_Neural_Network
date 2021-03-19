@@ -26,6 +26,8 @@ First load the neuralnet package and other libraries used
 
 library(neuralnet)
 library(readr) 
+library(dplyr) 
+
 ```
 
 Upload data
@@ -55,10 +57,26 @@ plot(nn)
 #Change the hidden layers and learningrate options and check both the prediction and accuracy
 
 
+```
 
-nn1 <- neuralnet(attention == 1 ~ eyes + face.forward + chin.up + squint + hunch + mouth1 + mouth2 + mouth3, D1, hidden = c(2,2), learningrate = 0.2)
+
+
+Create test set, confusion matrix, and analyze prediction accuracy 
+
+```{r}
+
+# create test set 
+head(D2) 
+test_set <- subset(D2, select = c("attention", "eyes", "face.forward", "chin.up", "squint", "hunch", "mouth1", "mouth2", "mouth3"))
+
+# accuracy 
+
+results <- data.frame(actual = test_set$attention, prediction = nn$net.result)  
+
 
 ```
+
+
 
 You have now trained a neural network! The plot shows you the layers of your newtork as black nodes and edges with the calculated weights on each edge. The blue nodes and edges are the bias/threshold terms - it is a little bit confusing that they are represented as nodes, they are not nodes in the sense that the black nodes are. The bias anchors the activation function, the weights change the shape of the activation function while the bias term changes the overall position of the activation function - if you have used linear regression the bias term is like the intercept of the regression equation, it shifts the trend line up and down the y axis, while the other parameters change the angle of the line. The plot also reports the final error rate and the number of iterations ("steps") that it took to reach these weights.
 
@@ -67,7 +85,7 @@ What happens if you increase the number of hidden layers in the neural net? Buil
 Now use your preferred neural net to predict the second data set. You will need to create a new data frame (D3) that only includes the input layers to use this command.
 
 ```{r}
-D3 <- 
+D3 <- subset(D2, select = c("eyes", "face.forward", "chin.up", "squint", "hunch", "mouth1", "mouth2", "mouth3"))
 ```
 
 Now you can create predictions using your neural net
@@ -78,7 +96,45 @@ pred <- predict(nn, D3)
 #The code below will tell you how accurate your model is att predicting the unseen data
 table(D2$attention == 1, pred[, 1] > 0.5)
 
-#Adjust both the hidden layer and lerarning rate and see if that has an impact on error, steps and prediction accuracy
+#Adjust both the hidden layer and learning rate and see if that has an impact on error, steps and prediction accuracy
+
+
+nn2 <- neuralnet(attention == 1 ~ eyes + face.forward + chin.up + squint + hunch + mouth1 + mouth2 + mouth3, D1, hidden = c(4,2), learningrate = 0.1)
+
+
+nn3 <- neuralnet(attention == 1 ~ eyes + face.forward + chin.up + squint + hunch + mouth1 + mouth2 + mouth3, D1, hidden = c(1,1), learningrate = 0.5)
+
+
+# create custom function to calculate model accuracy based on confusion matrix 
+
+
+mod_acc <- function(model) { 
+  
+pred <- predict(model, D3) 
+x <- table(D2$attention == 1, pred[, 1] > 0.5)
+true_neg <- x[1,1] 
+true_pos <- x[2,2] 
+false_pos <- x[1,2]
+false_neg <- x[2,1]
+correct <- (true_neg + true_pos) / (true_neg + true_pos + false_pos + false_neg)
+correct
+
+  }
+
+
+mod_acc(nn) 
+mod_acc(nn2) 
+mod_acc(nn3) 
+
+# create list object to store model accuracies for comparison 
+
+fits <- list() 
+
+fits$nn <- mod_acc(nn) 
+fits$nn2 <- mod_acc(nn2) 
+fits$nn3 <- mod_acc(nn3) 
+fits
+
 
 
 ```
@@ -87,10 +143,64 @@ table(D2$attention == 1, pred[, 1] > 0.5)
 
 1. How accurate is your neural net? How can you tell?
 
+The three neural network algorithms that I created - nn, nn2, and nn3 - are 97%, 98% and 90% accurate, respectively. The accuracy of the model was calculated from the confusion matrix. Specifically, the accuracy refers to the sum of the true positive and true negatives that the model predicted divided by the total number of predictions that the model made. 
+
 2. How would you explain your model to the students whose behavior you are predicting? 
 
+I would explain that this model is able to predict whether the student is paying attention based on 8 factors (e.g. eyes, mouth smiling, frowning, etc). 
+
 3. This is a very simple example of a neural network. Real facial recognition is very complex though. Would a neural network be a good solution for predicting real facial movements? Why, why not? 
+
+
+
+
 
 ## Repeat with your own data
 
 Either synthesize a data set or find a data set online and build a neural net to predict a binary outcome from several inputs. Split your data into two sets and use one set to train the neural net and the other set to make predictions. Change the hidden layers and learning rate until you get the most accurate model you can.
+
+
+
+```{r}
+
+
+library(peopleanalyticsdata) 
+
+data(recruiting) 
+
+head(recruiting) 
+
+recruiting[recruiting == "F"] <- 1 
+recruiting[recruiting == "M"] <- 2 
+
+summary(recruiting$gpa) 
+sapply(recruiting, summary) 
+
+
+# data standardization ('feature scaling')
+
+#min_max <- function(x) { 
+  
+  #return((x- min(x) / max(x) - min(x))) }
+
+
+# data split 
+
+
+
+
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
