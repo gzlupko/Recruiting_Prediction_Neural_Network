@@ -60,24 +60,6 @@ plot(nn)
 ```
 
 
-
-Create test set, confusion matrix, and analyze prediction accuracy 
-
-```{r}
-
-# create test set 
-head(D2) 
-test_set <- subset(D2, select = c("attention", "eyes", "face.forward", "chin.up", "squint", "hunch", "mouth1", "mouth2", "mouth3"))
-
-# accuracy 
-
-results <- data.frame(actual = test_set$attention, prediction = nn$net.result)  
-
-
-```
-
-
-
 You have now trained a neural network! The plot shows you the layers of your newtork as black nodes and edges with the calculated weights on each edge. The blue nodes and edges are the bias/threshold terms - it is a little bit confusing that they are represented as nodes, they are not nodes in the sense that the black nodes are. The bias anchors the activation function, the weights change the shape of the activation function while the bias term changes the overall position of the activation function - if you have used linear regression the bias term is like the intercept of the regression equation, it shifts the trend line up and down the y axis, while the other parameters change the angle of the line. The plot also reports the final error rate and the number of iterations ("steps") that it took to reach these weights.
 
 What happens if you increase the number of hidden layers in the neural net? Build a second neural net with more or fewer layers in it and determine if this improves your predictions or not? How can you tell if your new neural network is doing a better job than your first?
@@ -86,6 +68,7 @@ Now use your preferred neural net to predict the second data set. You will need 
 
 ```{r}
 D3 <- subset(D2, select = c("eyes", "face.forward", "chin.up", "squint", "hunch", "mouth1", "mouth2", "mouth3"))
+
 ```
 
 Now you can create predictions using your neural net
@@ -154,31 +137,25 @@ I would explain that this model is able to predict whether the student is paying
 
 
 
-
 ## Repeat with your own data
 
 Either synthesize a data set or find a data set online and build a neural net to predict a binary outcome from several inputs. Split your data into two sets and use one set to train the neural net and the other set to make predictions. Change the hidden layers and learning rate until you get the most accurate model you can.
 
 
+Load, clean, and normalize data: 
 
 ```{r}
-
-
 library(peopleanalyticsdata) 
-
 data(recruiting) 
 
-head(recruiting) 
-
+# clean recruiting data 
 recruiting[recruiting == "F"] <- 1 
 recruiting[recruiting == "M"] <- 2 
-
-summary(recruiting$gpa) 
-sapply(recruiting, summary) 
+#summary(recruiting$gpa) 
+#sapply(recruiting, summary) 
 
 
 # data normalization ('feature scaling')
-
 normalize <- function(x) {
   
 return ((x - min(x)) / (max(x) - min(x))) 
@@ -186,14 +163,18 @@ return ((x - min(x)) / (max(x) - min(x)))
   } 
 
 recruiting_numeric <- as.data.frame(lapply(recruiting, as.numeric)) 
-recruiting_norm <- as.data.frame(lapply(recruiting_numeric, normalize)) 
+recruiting_norm <- as.data.frame(lapply(recruiting_numeric, normalize))
+```
 
 
+Data Split - training and testing sets: 
 
+```{r}
 # data split 
 
 N <- (length(recruiting_norm$hired)/2)  
 
+# equal split - 483 rows in each set 
 train_size <- floor(nrow(recruiting_norm)*0.5) 
 test_size <- (nrow(recruiting_norm) - train_size) 
 
@@ -201,47 +182,60 @@ test_size <- (nrow(recruiting_norm) - train_size)
 set.seed(777)
 
 selected <- sample(seq_len(nrow(recruiting_norm)),size = train_size)
-training_set <- recruiting_norm[selected, ]
+train_set <- recruiting_norm[selected, ]
 test_set <- recruiting_norm[-selected, ]
 
-nrow(training_set) 
+nrow(train_set) 
 nrow(test_set) 
 
 
-head(training_set) 
-head(test_set) 
+head(train_set) 
+head(test_set)
 
-
-# hiring predictions with neural networks 
-
-hiring_mod_1 <- neuralnet(hired == 1 ~ sat + gpa + apttest + int1, training_set, hidden = c(2,2), learningrate = 0.2)
+```
 
 
 
+Generate first neural network model to predict the likelihood that an individual is hired based on their sat, gpa,and their performance on an aptitude test. 
 
-train <- subset(training_set, select = c("gpa","gender", "apttest", "int1", "int2", "int3", "sat")) 
+```{r}
 
-#The code below will use your model to predict the outcome using D3 data
+# hiring predictions with neural network 
+
+hiring_mod_1 <- neuralnet(hired == 1 ~ sat + gpa + apttest, train_set, hidden = c(2,2), learningrate = 0.2)
 
 
-pred <- predict(hiring_mod_1, train)
+test_mod_1 <- subset(test_set, select = c("sat", "gpa", "apttest")) 
+
+pred <- predict(hiring_mod_1, test_mod_1)
+
 
 table(test_set$hired == 1, pred[, 1] > 0.5)
+```
 
-hiring_mod_accuracy <- function(mod) { 
+The last line of code produced a confusion matrix for the predictions made by the first neural network model. To calculate the overall accurary of the model's predictions, a custom function is built in the following code chunk to calculate model accuracy and will be re-usable throughout the subsequent iterations of model testing in this project. 
+
+Custom function to calculate model accuracy: 
+
+```{r}
+
+conf_matrix <- table(test_set$hired == 1, pred[, 1] > 0.5)
+
+# the function takes a confusion matrix table as input 
+model_accuracy <- function(x) { 
   
-pred <- predict(mod, train)
-x <- table(test_set$hired == 1, pred[, 1] > 0.5)
 true_neg <- x[1,1] 
 true_pos <- x[2,2] 
 false_pos <- x[1,2]
 false_neg <- x[2,1]
 correct <- (true_neg + true_pos) / (true_neg + true_pos + false_pos + false_neg)
 correct
-  
-}
 
-hiring_mod_accuracy(hiring_mod_1) 
+  }
+
+
+# test function output 
+model_accuracy(conf_matrix)
 
 
 ```
@@ -251,39 +245,37 @@ In the following code chunks I add inputs and layers to the nn model sequentiall
 
 ```{r}
 
-# add hidden layer to neural netowrk: subsequent interviews 
+# add remaining variables to the hiring model
 
-hiring_mod_2 <- neuralnet(hired == 1 ~ sat + gpa + apttest + int1 + int2 + int3, training_set, hidden = c(2,2), learningrate = 0.2)
-
-
-hiring_mod_2
-pred_mod_2 <- predict(hiring_mod_2, train)
-table(test_set$hired == 1, pred_mod_2[, 1] > 0.5)
+hiring_mod_2 <- neuralnet(hired == 1 ~ sat + gpa + apttest + gender + int1 + int2 + int3, train_set, hidden = c(2,2), learningrate = 0.2)
 
 
+test_mod_2 <- subset(test_set, select = c("sat", "gpa", "apttest", "gender", "int1", "int2", "int3")) 
+
+pred2 <- predict(hiring_mod_2, test_mod_2)
+
+# generate confusion matrix 
+table(test_set$hired == 1, pred2[, 1] > 0.5)
 
 
-# calculate nn model accuracy 
-hiring_mod_accuracy(hiring_mod_2) 
+# assess model accuracy 
 
+conf_matrix_2 <- table(test_set$hired == 1, pred2[, 1] > 0.5)
+model_accuracy(conf_matrix_2)
 
 ```
 
-Add gender  
+By adding the 5 remaining predictor variables, the neural network's performance in predicting who would be hired by the company increased from 79% to 93%. While this is a significant improvement in performance, the model may be able to be further improved by adjusting the hidden layers, its repetitions, or its learning rate.
+
+
+
 
 ```{r}
 
-hiring_mod_3 <- neuralnet(hired == 1 ~ sat + gpa + apttest + int1 + int2 + int3 ,training_set, hidden = c(3,2), learningrate = 0.2)
-
-# calculate nn model accuracy 
-hiring_mod_accuracy(hiring_mod_3, test_set) 
-
-
-predict(hiring_mod_3, test_set) 
-x <- table(df$hired == 1, hiring_pred[ , 1] > 0.5)
-
-?predict
 ```
+
+
+Debate of predict vs explain . . . 
 
 
 Compare with logistic regression
