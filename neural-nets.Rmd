@@ -119,7 +119,6 @@ fits$nn3 <- mod_acc(nn3)
 fits
 
 
-
 ```
 
 ## Please answer the following questions:
@@ -134,12 +133,17 @@ I would explain that this model is able to predict whether the student is paying
 
 3. This is a very simple example of a neural network. Real facial recognition is very complex though. Would a neural network be a good solution for predicting real facial movements? Why, why not? 
 
+Simple perceptron models would not be a good algorithm for facial recognition but other neural networks architectures, like convolutional neural networks, could offer accuracy in recognition tasks. ANNs could also be ensembled with geometric-based approaches like PCA. 
 
 
 
 ## Repeat with your own data
 
-Either synthesize a data set or find a data set online and build a neural net to predict a binary outcome from several inputs. Split your data into two sets and use one set to train the neural net and the other set to make predictions. Change the hidden layers and learning rate until you get the most accurate model you can.
+
+The project below examines a company's recruitment data (fictitional company) and examines two main approaches to analyzing recruitment data - prediction and explanation. The data used in this project was accessed from Keith McNulty's peopleanalyticsdata library (available on CRAN), which is an accompaniment to the Handbook of Regression Modeling for People Analytics.
+
+The first half of this notebook uses a neural network model to predict the likelihood that an individual was hired based on 8 variables. The second half of this notebook uses logistic regression to predict hiring likelihood based on the same 8 variables. While regression model was slightly less accurate in predicting 'off the shelf', the use of regression allows for a closer examination of the impact that each variable has on the overall likelihood of a candidate being hired. Both models are useful but it depends the business case that needs to solved. 
+
 
 
 Load, clean, and normalize data: 
