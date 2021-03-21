@@ -148,6 +148,7 @@ Load, clean, and normalize data:
 library(peopleanalyticsdata) 
 data(recruiting) 
 
+
 # clean recruiting data 
 recruiting[recruiting == "F"] <- 1 
 recruiting[recruiting == "M"] <- 2 
@@ -185,12 +186,12 @@ selected <- sample(seq_len(nrow(recruiting_norm)),size = train_size)
 train_set <- recruiting_norm[selected, ]
 test_set <- recruiting_norm[-selected, ]
 
-nrow(train_set) 
-nrow(test_set) 
+train_set <- as.data.frame(lapply(train_set, as.numeric))
+test_set <- as.data.frame(lapply(test_set, as.numeric))
 
 
-head(train_set) 
-head(test_set)
+str(train_set) 
+str(test_set) 
 
 ```
 
@@ -263,6 +264,10 @@ table(test_set$hired == 1, pred2[, 1] > 0.5)
 conf_matrix_2 <- table(test_set$hired == 1, pred2[, 1] > 0.5)
 model_accuracy(conf_matrix_2)
 
+
+plot(hiring_mod_2) 
+
+
 ```
 
 By adding the 5 remaining predictor variables, the neural network's performance in predicting who would be hired by the company increased from 79% to 93%. While this is a significant improvement in performance, the model may be able to be further improved by adjusting the hidden layers, its repetitions, or its learning rate.
@@ -271,24 +276,128 @@ By adding the 5 remaining predictor variables, the neural network's performance 
 
 
 ```{r}
+# learning rate was adjusted to 0.1 
+hiring_mod_3 <- neuralnet(hired == 1 ~ sat + gpa + apttest + gender + int1 + int2 + int3, train_set, hidden = c(2,2), learningrate = 0.1)
 
+
+test_mod_3 <- subset(test_set, select = c("sat", "gpa", "gender", "apttest", "int1", "int2", "int3")) 
+
+
+pred3 <- predict(hiring_mod_3, test_mod_3)  
+
+# generate confusion matrix 
+table(test_set$hired == 1, pred3[, 1] > 0.5)
+
+
+# assess model accuracy 
+
+conf_matrix_3 <- table(test_set$hired == 1, pred3[, 1] > 0.5)
+model_accuracy(conf_matrix_3)
 ```
 
 
-Debate of predict vs explain . . . 
+Adding additional hidden layers 
+
+```{r}
+
+# add additional hidden layers
+
+hiring_mod_4 <- neuralnet(hired == 1 ~ sat + gpa + apttest + gender + int1 + int2 + int3, train_set, hidden = c(4,3,2,1), learningrate = 0.2)
 
 
-Compare with logistic regression
+test_mod_4 <- subset(test_set, select = c("sat", "gpa", "apttest", "gender", "int1", "int2", "int3")) 
+
+pred4 <- predict(hiring_mod_4, test_mod_4)
+
+# generate confusion matrix 
+table(test_set$hired == 1, pred4[, 1] > 0.5)
+
+
+# assess model accuracy 
+
+conf_matrix_4 <- table(test_set$hired == 1, pred4[, 1] > 0.5)
+model_accuracy(conf_matrix_4)
+
+
+# plot nn model 4 
+
+plot(hiring_mod_4) 
+
+```
+
+ 
+ 
+While the neural networks predict the likelihood that a candidate will be hired with accuracy, there are business cases in which it would be helpful to better understand the relationships between the predictor variables on the outcome. The following code chunks implement logistic regression to compare its accuracy to the neural network models. Then, the components of the logistic regression model are inspect to better understand the individual contributions of the variables on the likelihood that a candidate is hired. 
+
+
+
+Logistic Regression
 
 
 ```{r}
 
+log_mod_1 <- glm(hired ~ sat + gpa + apttest + int1 + int2 + int3 , data = train_set, family = "binomial")
 
-log_mod_1 <- glm(hired ~ sat + gpa + apttest + int1 + int2 + int3 , data = training_set, family = "binomial")
+test_mod_5 <- subset(test_set, select = c("sat", "gpa", "apttest", "gender", "int1", "int2", "int3")) 
+
+
+pred5 <- predict(log_mod_1, test_mod_5, type = "response") 
+
+pred5 <- as.data.frame(pred5) 
+
+# assess model accuracy 
+
+conf_matrix_5 <- table(test_set$hired == 1, pred5[, 1] > 0.5)
+model_accuracy(conf_matrix_5)
+
+
+# view model fit 
+
+summary(log_mod_1) 
 
 
 ```
 
+
+A summary of the logistic regression model find that SAT and GPA do not significantly contribute to the prediction. A second logistic regression model is created and tested below without SAT and GPA.
+
+
+```{r}
+
+log_mod_2 <- glm(hired ~ apttest + int1 + int2 + int3 , data = train_set, family = "binomial")
+
+
+test_mod_6 <- subset(test_set, select = c("sat", "gpa", "apttest", "gender", "int1", "int2", "int3")) 
+
+
+pred6 <- predict(log_mod_2, test_mod_6, type = "response") 
+
+pred6 <- as.data.frame(pred6) 
+
+# assess model accuracy 
+
+conf_matrix_6 <- table(test_set$hired == 1, pred6[, 1] > 0.5)
+model_accuracy(conf_matrix_6)
+
+
+# view model fit 
+
+summary(log_mod_2) 
+
+# compare the models 
+
+anova(log_mod_1, log_mod_2, test = "Chisq") 
+
+
+```
+
+
+A lower AIC value was obtained for AIC, which is an indication that the model fits the data better. However, a chi square test of significance did not find that the models were significantly different. 
+
+In any case, the use of logistic regression in this example, as a follow up to neural network predictions, shows the utility of regression analysis as it allows a closer examination of the individual contributions of the variables. While the neural network performs better without any parameter tuning, the logistic regression aids interpretitability, which would be essential if we were designing interventions to improve this company's HR recruiting function.
+
+
+An accompaniment to this Rmd file can be found on Kaggle at https://www.kaggle.com/gianzlupko/recruiting-decisions-predicting-vs-explaining?scriptVersionId=57300078. 
 
 
 
